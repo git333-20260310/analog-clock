@@ -66,24 +66,25 @@
 
       .mark {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 4px;
-        height: 44%;
-        transform-origin: center top;
+        inset: 0;
+        transform-origin: center center;
+        z-index: 2;
       }
 
       .mark::before {
         content: "";
-        display: block;
-        margin: 0 auto;
-        width: 100%;
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
         height: 10px;
         border-radius: 999px;
         background: #334155;
       }
 
       .mark.major::before {
+        width: 4px;
         height: 16px;
         background: #0f172a;
       }
@@ -158,7 +159,7 @@
       for (let i = 0; i < 60; i++) {
         const mark = document.createElement('div');
         mark.className = i % 5 === 0 ? 'mark major' : 'mark';
-        mark.style.transform = `translate(-50%, -50%) rotate(${i * 6}deg)`;
+        mark.style.transform = `rotate(${i * 6}deg)`;
         clock.appendChild(mark);
       }
 
