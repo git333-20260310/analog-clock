@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>秒まで見えるアナログ時計</title>
+    <style>
+      :root {
+        --bg1: #0f172a;
+        --bg2: #1d3557;
+        --face: #f8fafc;
+        --ring: #94a3b8;
+        --hour: #0f172a;
+        --minute: #1e293b;
+        --second: #ef4444;
+        --accent: #38bdf8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: "Avenir Next", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+        background:
+          radial-gradient(1200px 500px at 10% 10%, #33415555, transparent),
+          radial-gradient(900px 500px at 90% 90%, #0ea5e955, transparent),
+          linear-gradient(135deg, var(--bg1), var(--bg2));
+        color: var(--face);
+      }
+
+      .app {
+        width: min(92vw, 420px);
+        text-align: center;
+      }
+
+      .clock {
+        width: min(80vw, 360px);
+        aspect-ratio: 1;
+        margin: 0 auto;
+        border-radius: 50%;
+        background: var(--face);
+        border: 10px solid var(--ring);
+        position: relative;
+        box-shadow:
+          0 24px 40px #02061766,
+          inset 0 0 0 6px #ffffff;
+      }
+
+      .center {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--second);
+        border: 2px solid #fff;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+      }
+
+      .mark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 4px;
+        height: 44%;
+        transform-origin: center top;
+      }
+
+      .mark::before {
+        content: "";
+        display: block;
+        margin: 0 auto;
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        background: #334155;
+      }
+
+      .mark.major::before {
+        height: 16px;
+        background: #0f172a;
+      }
+
+      .hand {
+        position: absolute;
+        left: 50%;
+        bottom: 50%;
+        transform-origin: 50% 100%;
+        border-radius: 999px;
+      }
+
+      .hour {
+        width: 8px;
+        height: 24%;
+        background: var(--hour);
+        margin-left: -4px;
+        z-index: 6;
+      }
+
+      .minute {
+        width: 6px;
+        height: 33%;
+        background: var(--minute);
+        margin-left: -3px;
+        z-index: 7;
+      }
+
+      .second {
+        width: 2px;
+        height: 40%;
+        background: var(--second);
+        margin-left: -1px;
+        z-index: 8;
+      }
+
+      .digital {
+        margin-top: 20px;
+        font-size: clamp(1.1rem, 4vw, 1.5rem);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: #e2e8f0;
+      }
+
+      .label {
+        margin-top: 8px;
+        font-size: 0.9rem;
+        opacity: 0.85;
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <section class="clock" aria-label="アナログ時計">
+        <div class="hand hour" id="hour-hand"></div>
+        <div class="hand minute" id="minute-hand"></div>
+        <div class="hand second" id="second-hand"></div>
+        <div class="center" aria-hidden="true"></div>
+      </section>
+      <div class="digital" id="digital-time" aria-live="polite"></div>
+      <div class="label">秒針とデジタル表示で秒を確認できます</div>
+    </main>
+
+    <script>
+      const clock = document.querySelector('.clock');
+      const hourHand = document.getElementById('hour-hand');
+      const minuteHand = document.getElementById('minute-hand');
+      const secondHand = document.getElementById('second-hand');
+      const digitalTime = document.getElementById('digital-time');
+
+      for (let i = 0; i < 60; i++) {
+        const mark = document.createElement('div');
+        mark.className = i % 5 === 0 ? 'mark major' : 'mark';
+        mark.style.transform = `translate(-50%, -50%) rotate(${i * 6}deg)`;
+        clock.appendChild(mark);
+      }
+
+      function pad(value) {
+        return String(value).padStart(2, '0');
+      }
+
+      function updateClock() {
+        const now = new Date();
+        const second = now.getSeconds() + now.getMilliseconds() / 1000;
+        const minute = now.getMinutes() + second / 60;
+        const hour = (now.getHours() % 12) + minute / 60;
+
+        hourHand.style.transform = `rotate(${hour * 30}deg)`;
+        minuteHand.style.transform = `rotate(${minute * 6}deg)`;
+        secondHand.style.transform = `rotate(${second * 6}deg)`;
+
+        digitalTime.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+        requestAnimationFrame(updateClock);
+      }
+
+      updateClock();
+    </script>
+  </body>
+</html>
